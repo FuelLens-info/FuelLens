@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - FuelLens</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div id="modalOverlay" class="modal-overlay"></div>
+    <div id="viewEmployeeModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('viewEmployeeModal')">&times;</span>
+            <h2>Employee Details</h2>
+            <div id="view-employee-details"></div>
+        </div>
+    </div>
+    <div id="editEmployeeModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editEmployeeModal')">&times;</span>
+            <h2>Edit Employee</h2>
+            <form id="edit-employee-form">
+                <input type="hidden" name="id" id="edit-employee-id">
+                <label>Name: <input type="text" name="name" id="edit-employee-name"></label><br>
+                <label>Role: <input type="text" name="role" id="edit-employee-role"></label><br>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+    <div id="removeEmployeeModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('removeEmployeeModal')">&times;</span>
+            <h2>Confirm Removal</h2>
+            <p>Are you sure you want to <b>permanently delete</b> this employee?</p>
+            <button id="confirm-remove-btn" class="btn-danger">Yes, Remove</button>
+            <button onclick="closeModal('removeEmployeeModal')" class="btn-secondary">Cancel</button>
+        </div>
+    </div>
+    <div id="addEmployeeModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addEmployeeModal')">&times;</span>
+            <h2>Add Employee</h2>
+            <form id="add-employee-form">
+                <label>Name: <input type="text" name="name" id="add-employee-name" required></label><br>
+                <label>Employee ID: <input type="text" name="employee_id" id="add-employee-employeeid" required></label><br>
+                <label>Role: <input type="text" name="role" id="add-employee-role" required></label><br>
+                <label>Password: <input type="password" name="password" id="add-employee-password" required></label><br>
+                <button type="submit" class="btn-primary">Add Employee</button>
+            </form>
+        </div>
+    </div>
+    <div id="createTaskModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('createTaskModal')">&times;</span>
+            <h2>Create Task</h2>
+            <form id="create-task-form">
+                <label>Title: <input type="text" name="title" id="task-title" required></label><br>
+                <label>Description: <textarea name="description" id="task-description" required></textarea></label><br>
+                <label>Due Date: <input type="date" name="due_date" id="task-due-date" required></label><br>
+                <label>Assign to Employee:
+                    <select name="employee_id" id="task-employee-id" required>
+                        <option value="">Select Employee</option>
+                    </select>
+                </label><br>
+                <button type="submit" class="btn-primary">Create Task</button>
+            </form>
+        </div>
+    </div>
+    <div id="editTaskModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('editTaskModal')">&times;</span>
+            <h2>Edit Task</h2>
+            <form id="edit-task-form">
+                <input type="hidden" name="id" id="edit-task-id">
+                <label>Title: <input type="text" name="title" id="edit-task-title" required></label><br>
+                <label>Description: <textarea name="description" id="edit-task-description" required></textarea></label><br>
+                <label>Due Date: <input type="date" name="due_date" id="edit-task-due-date" required></label><br>
+                <label>Status:
+                    <select name="status" id="edit-task-status" required>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </label><br>
+                <label>Assign to Employee:
+                    <select name="employee_id" id="edit-task-employee-id" required>
+                        <option value="">Select Employee</option>
+                    </select>
+                </label><br>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </form>
+        </div>
+    </div>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <img src="2(1).png" alt="Fuel Lens Logo" style="width: 70px; height: auto; margin-right: 15px;">
+                    <span>FuelLens</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#overview" class="nav-item active" data-tab="overview">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#employees" class="nav-item" data-tab="employees">
+                    <i class="fas fa-users"></i>
+                    <span>Employee Management</span>
+                </a>
+                <a href="#tasks" class="nav-item" data-tab="tasks">
+                    <i class="fas fa-tasks"></i>
+                    <span>Task Management</span>
+                </a>
+                <a href="#reports" class="nav-item" data-tab="reports">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
+                </a>
+                <a href="php/logout.php" class="nav-item logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-content">
+                    <h1>Admin <span class="text-gradient">Dashboard</span></h1>
+                    <p>Manage employees, tasks, and monitor system performance.</p>
+                </div>
+                <div class="header-actions">
+                    <button class="notification-btn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">5</span>
+                    </button>
+                    <div class="user-avatar">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Overview Tab -->
+            <div class="tab-content active" id="overview-tab">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>24</h3>
+                            <p>Total Employees</p>
+                            <span class="stat-change positive">+3 this month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>12</h3>
+                            <p>Pending Tasks</p>
+                            <span class="stat-change">8 due today</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>156</h3>
+                            <p>Completed Tasks</p>
+                            <span class="stat-change positive">+18 this week</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>3</h3>
+                            <p>Overdue Tasks</p>
+                            <span class="stat-change">Needs attention</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Quick Actions</h2>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                        <button class="btn-primary" onclick="showAddEmployeeModal()">
+                            <i class="fas fa-user-plus"></i>
+                            Add Employee
+                        </button>
+                        <button class="btn-secondary" onclick="showCreateTaskModal()">
+                            <i class="fas fa-plus"></i>
+                            Create Task
+                        </button>
+                        <button class="btn-outline" onclick="generateReport()">
+                            <i class="fas fa-file-alt"></i>
+                            Generate Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Employee Management Tab -->
+            <div class="tab-content" id="employees-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Employee Management</h2>
+                        <button class="btn-primary" onclick="showAddEmployeeModal()">
+                            <i class="fas fa-user-plus"></i>
+                            Add Employee
+                        </button>
+                    </div>
+                    
+                    <!-- Search and Filter -->
+                    <div style="display: flex; gap: 16px; margin-bottom: 24px;">
+                        <div style="flex: 1; position: relative;">
+                            <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                            <input type="text" placeholder="Search employees..." style="width: 100%; padding: 12px 12px 12px 40px; background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: white;">
+                        </div>
+                        <button class="btn-outline">
+                            <i class="fas fa-filter"></i>
+                            Filter
+                        </button>
+                    </div>
+
+                    <!-- Employee Table -->
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                    <th style="text-align: left; padding: 12px; color: #e2e8f0; font-weight: 600;">Employee</th>
+                                    <th style="text-align: left; padding: 12px; color: #e2e8f0; font-weight: 600;">Role</th>
+                                    <th style="text-align: left; padding: 12px; color: #e2e8f0; font-weight: 600;">Status</th>
+                                    <th style="text-align: left; padding: 12px; color: #e2e8f0; font-weight: 600;">Tasks</th>
+                                    <th style="text-align: left; padding: 12px; color: #e2e8f0; font-weight: 600;">Join Date</th>
+                                    <th style="text-align: right; padding: 12px; color: #e2e8f0; font-weight: 600;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="employee-table-body">
+                                <!-- Employee rows will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Management Tab -->
+            <div class="tab-content" id="tasks-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Task Management</h2>
+                        <button class="btn-primary" onclick="showCreateTaskModal()">
+                            <i class="fas fa-plus"></i>
+                            Create Task
+                        </button>
+                    </div>
+                    <div id="task-list"></div>
+                </div>
+            </div>
+
+            <!-- Reports Tab -->
+            <div class="tab-content" id="reports-tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Reports & Analytics</h2>
+                    </div>
+                    <div class="empty-state">
+                        <i class="fas fa-chart-bar"></i>
+                        <h3>Reports & Analytics</h3>
+                        <p>Comprehensive reporting and analytics dashboard coming soon.</p>
+                        <button class="btn-primary">Generate Report</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+    <script>
+        // Admin-specific functionality
+        function showAddEmployeeModal() {
+            document.getElementById('add-employee-form').reset();
+            showModal('addEmployeeModal');
+        }
+
+        function showCreateTaskModal() {
+            // Fetch employees for the dropdown
+            fetch('php/get_employees.php')
+                .then(res => res.json())
+                .then(data => {
+                    const select = document.getElementById('task-employee-id');
+                    select.innerHTML = '<option value="">Select Employee</option>';
+                    if (data.success) {
+                        data.employees.forEach(emp => {
+                            select.innerHTML += `<option value="${emp.id}">${emp.name} (${emp.employee_id})</option>`;
+                        });
+                    }
+                    document.getElementById('create-task-form').reset();
+                    showModal('createTaskModal');
+                });
+        }
+
+        function generateReport() {
+            showSuccessMessage('Report generation started');
+        }
+
+        // Fetch and display employees
+        function fetchEmployees() {
+          fetch('php/get_employees.php')
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                const tbody = document.getElementById('employee-table-body');
+                tbody.innerHTML = '';
+                data.employees.forEach(emp => {
+                  const tr = document.createElement('tr');
+                  tr.innerHTML = `
+                    <td>
+                      <div>
+                        <div style="color: white; font-weight: 500;">${emp.name}</div>
+                        <div style="color: #64748b; font-size: 12px;">${emp.employee_id}</div>
+                      </div>
+                    </td>
+                    <td style="color: #cbd5e1;">${emp.role}</td>
+                    <td><span style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">Active</span></td>
+                    <td><div style="color: white;">-</div><div style="color: #94a3b8; font-size: 12px;">-</div></td>
+                    <td style="color: #cbd5e1;">${emp.created_at}</td>
+                    <td style="text-align: right;">
+                      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                        <button onclick="viewEmployee(${emp.id})" style="background: none; border: none; color: #3b82f6; cursor: pointer; padding: 4px;"><i class='fas fa-eye'></i></button>
+                        <button onclick="editEmployee(${emp.id}, '${emp.name}', '${emp.role}')" style="background: none; border: none; color: #10b981; cursor: pointer; padding: 4px;"><i class='fas fa-edit'></i></button>
+                        <button onclick="removeEmployee(${emp.id})" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 4px;"><i class='fas fa-trash'></i></button>
+                      </div>
+                    </td>
+                  `;
+                  tbody.appendChild(tr);
+                });
+              }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchEmployees);
+
+        // Modal helpers
+        function showModal(id) {
+          // Hide all modals first
+          document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+          document.getElementById('modalOverlay').style.display = 'block';
+          document.getElementById(id).style.display = 'block';
+        }
+        function closeModal(id) {
+          document.getElementById(id).style.display = 'none';
+          document.getElementById('modalOverlay').style.display = 'none';
+        }
+
+        // Hide overlay and modals if overlay is clicked
+        window.onload = function() {
+          document.getElementById('modalOverlay').onclick = function() {
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+            this.style.display = 'none';
+          };
+        };
+
+        // View Employee
+        function viewEmployee(id) {
+          fetch('php/get_employees.php')
+            .then(res => res.json())
+            .then(data => {
+              const emp = data.employees.find(e => e.id == id);
+              if (emp) {
+                document.getElementById('view-employee-details').innerHTML = `
+                  <p><strong>Name:</strong> ${emp.name}</p>
+                  <p><strong>Employee ID:</strong> ${emp.employee_id}</p>
+                  <p><strong>Role:</strong> ${emp.role}</p>
+                  <p><strong>Join Date:</strong> ${emp.created_at}</p>
+                `;
+                showModal('viewEmployeeModal');
+              }
+            });
+        }
+        window.viewEmployee = viewEmployee;
+
+        // Edit Employee
+        function editEmployee(id, name, role) {
+          document.getElementById('edit-employee-id').value = id;
+          document.getElementById('edit-employee-name').value = name;
+          document.getElementById('edit-employee-role').value = role;
+          showModal('editEmployeeModal');
+        }
+        window.editEmployee = editEmployee;
+
+        document.getElementById('edit-employee-form').onsubmit = function(e) {
+          e.preventDefault();
+          const id = document.getElementById('edit-employee-id').value;
+          const name = document.getElementById('edit-employee-name').value;
+          const role = document.getElementById('edit-employee-role').value;
+          fetch('php/edit_employee.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id=${encodeURIComponent(id)}&name=${encodeURIComponent(name)}&role=${encodeURIComponent(role)}`
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              closeModal('editEmployeeModal');
+              fetchEmployees();
+            } else {
+              alert('Failed to update employee: ' + (data.error || 'Unknown error'));
+            }
+          });
+        };
+
+        // Remove Employee
+        let removeEmployeeId = null;
+        function removeEmployee(id) {
+          removeEmployeeId = id;
+          showModal('removeEmployeeModal');
+        }
+        window.removeEmployee = removeEmployee;
+        document.getElementById('confirm-remove-btn').onclick = function() {
+          if (removeEmployeeId) {
+            fetch('php/delete_employee.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: 'id=' + encodeURIComponent(removeEmployeeId)
+            })
+            .then(res => res.json())
+            .then(data => {
+              if (data.success) {
+                fetchEmployees();
+              } else {
+                alert('Failed to remove employee');
+              }
+              closeModal('removeEmployeeModal');
+            });
+          }
+        };
+
+        document.getElementById('add-employee-form').onsubmit = function(e) {
+          e.preventDefault();
+          const name = document.getElementById('add-employee-name').value;
+          const employee_id = document.getElementById('add-employee-employeeid').value;
+          const role = document.getElementById('add-employee-role').value;
+          const password = document.getElementById('add-employee-password').value;
+          fetch('php/add_employee.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `name=${encodeURIComponent(name)}&employee_id=${encodeURIComponent(employee_id)}&role=${encodeURIComponent(role)}&password=${encodeURIComponent(password)}`
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              closeModal('addEmployeeModal');
+              fetchEmployees();
+            } else {
+              alert('Failed to add employee: ' + (data.error || 'Unknown error'));
+            }
+          });
+        };
+
+        document.getElementById('create-task-form').onsubmit = function(e) {
+            e.preventDefault();
+            const title = document.getElementById('task-title').value;
+            const description = document.getElementById('task-description').value;
+            const due_date = document.getElementById('task-due-date').value;
+            const employee_id = document.getElementById('task-employee-id').value;
+            fetch('php/add_task.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&due_date=${encodeURIComponent(due_date)}&employee_id=${encodeURIComponent(employee_id)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    closeModal('createTaskModal');
+                    // Optionally refresh task list here
+                    alert('Task created successfully!');
+                } else {
+                    alert('Failed to create task: ' + (data.error || 'Unknown error'));
+                }
+            });
+        };
+
+        function fetchTasks() {
+          fetch('php/get_tasks.php')
+            .then(res => res.json())
+            .then(data => {
+              const taskList = document.getElementById('task-list');
+              taskList.innerHTML = '';
+              if (data.success && data.tasks.length > 0) {
+                data.tasks.forEach(task => {
+                  const card = document.createElement('div');
+                  card.className = 'task-card';
+                  card.style = 'background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.07);';
+                  card.innerHTML = `
+                    <h3 style="margin:0 0 8px 0; color:#fff;">${task.title}</h3>
+                    <div style="color:#cbd5e1; margin-bottom:8px;">${task.description}</div>
+                    <div style="margin-bottom:8px;"><b>Assignee:</b> ${task.assignee_name} (${task.assignee_employee_id})</div>
+                    <div style="margin-bottom:8px;"><b>Status:</b> <span style="color:${task.status==='Completed'?'#10b981':task.status==='In Progress'?'#f59e42':'#f43f5e'};font-weight:600;">${task.status}</span></div>
+                    <div style="margin-bottom:8px;"><b>Due Date:</b> ${task.due_date ? task.due_date : '-'}</div>
+                    <button class="btn-outline" onclick="viewTaskDetails(${task.id})">View Details</button>
+                    <button class="btn-secondary" onclick="editTask(${task.id})">Edit Task</button>
+                  `;
+                  taskList.appendChild(card);
+                });
+              } else {
+                taskList.innerHTML = '<div style="color:#94a3b8;">No tasks found.</div>';
+              }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', fetchTasks);
+
+        function editTask(taskId) {
+            // Fetch task details and employees
+            Promise.all([
+                fetch('php/get_tasks.php').then(res => res.json()),
+                fetch('php/get_employees.php').then(res => res.json())
+            ]).then(([taskData, empData]) => {
+                if (taskData.success && empData.success) {
+                    const task = taskData.tasks.find(t => t.id == taskId);
+                    if (!task) return;
+                    document.getElementById('edit-task-id').value = task.id;
+                    document.getElementById('edit-task-title').value = task.title;
+                    document.getElementById('edit-task-description').value = task.description;
+                    document.getElementById('edit-task-due-date').value = task.due_date ? task.due_date.split('T')[0] : '';
+                    document.getElementById('edit-task-status').value = task.status;
+                    const select = document.getElementById('edit-task-employee-id');
+                    select.innerHTML = '<option value="">Select Employee</option>';
+                    empData.employees.forEach(emp => {
+                        select.innerHTML += `<option value="${emp.id}"${emp.id == task.assignee_employee_id ? ' selected' : ''}>${emp.name} (${emp.employee_id})</option>`;
+                    });
+                    showModal('editTaskModal');
+                }
+            });
+        }
+        window.editTask = editTask;
+
+        document.getElementById('edit-task-form').onsubmit = function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit-task-id').value;
+            const title = document.getElementById('edit-task-title').value;
+            const description = document.getElementById('edit-task-description').value;
+            const due_date = document.getElementById('edit-task-due-date').value;
+            const status = document.getElementById('edit-task-status').value;
+            const employee_id = document.getElementById('edit-task-employee-id').value;
+            fetch('php/edit_task.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id=${encodeURIComponent(id)}&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&due_date=${encodeURIComponent(due_date)}&status=${encodeURIComponent(status)}&employee_id=${encodeURIComponent(employee_id)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    closeModal('editTaskModal');
+                    fetchTasks();
+                } else {
+                    alert('Failed to update task: ' + (data.error || 'Unknown error'));
+                }
+            });
+        };
+    </script>
+</body>
+</html>
